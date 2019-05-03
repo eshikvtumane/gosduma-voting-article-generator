@@ -133,7 +133,7 @@ def start_move_articles():
     votes = result.get('votes', None)
 
     if votes is not None:
-        for vote in votes[:1]:
+        for vote in votes:
             result = vote['result']
             vote_id = vote['id']
 
