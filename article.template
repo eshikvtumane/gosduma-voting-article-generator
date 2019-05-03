@@ -1,0 +1,32 @@
+<p>
+    <b>Статистика по партиям</b>
+    <br/>
+    <br/>
+    {% for faction in factions %}
+          <b>{{ faction.abbr }}</b>:<br/>
+           • За - {{ faction.for_vote_faction }} ч.<br/>
+           • Против - {{ faction.against_faction }} ч.<br/>
+           • Воздержались - {{ faction.abstain_faction }} ч.<br/>
+           • Не голосовали - {{ faction.absent_faction }} ч.<br/>
+    <br/>
+    {% endfor %}
+</p>
+
+
+<p><b>Список депутатов</b></p></br>
+{% for faction in factions %}
+  <p>
+      <b>{{ faction.name }}</b>
+  </p>
+  <p>
+      {% for depute in faction.deputies %}
+          {{ depute.get_fio() }} - {{ depute.get_result() }} {{ depute.get_smile() }}
+          <br/>
+      {% endfor %}
+  </p>
+<br/>
+{% endfor %}
+
+<p>
+ <i>Источник: </i><a href="http://duma.gov.ru">сайт Государственно Думы РФ</a>
+</p>
