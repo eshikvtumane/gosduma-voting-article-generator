@@ -3,3 +3,4 @@ Pillow==6.0.0
 beautifulsoup4==4.7.1
 jinja2==2.10.1
 matplotlib
+requests
