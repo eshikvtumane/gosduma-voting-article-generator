@@ -17,6 +17,9 @@ from settings import TJ_API_KEY, GD_TOKEN_APP, GD_TOKEN
 from tjornal_api.api import TjApi
 
 
+logging.basicConfig(filename="sample.log", level=logging.INFO)
+
+
 class Vote(object):
     def __init__(self, vote_info):
         self.vote_info = vote_info
@@ -144,10 +147,8 @@ def start_move_articles():
 
             vote_in_db = db.get_vote(vote_id=vote_id, vote_date=vote_obj.vote_date)
 
-            if vote_in_db is None:
-                db.create_vote_history(vote_id=vote_id, vote_date=vote_obj.vote_date)
-            else:
-                break
+            if vote_in_db is not None:
+                continue
 
             gd_screen = GosDumaScreen(vote_obj.vote_date,
                                       vote_obj.for_vote,
@@ -214,12 +215,15 @@ def start_move_articles():
                 ]
             }
             file = json.dumps(entry)
-            tj_api.create_entry(vote_obj.subject, render_template, settings.SUBSITE_ID, entry=file)
+            result = tj_api.create_entry(vote_obj.subject, render_template, settings.SUBSITE_ID, entry=file)
+            if result['error']['code'] == 400:
+                logging.error(result['message'])
+            else:
+                db.create_vote_history(vote_id=vote_id, vote_date=vote_obj.vote_date)
+            time.sleep(3)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="sample.log", level=logging.INFO)
-
     try:
         start_move_articles()
         logging.info("Success")
