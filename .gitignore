@@ -218,3 +218,5 @@ dmypy.json
 
 *.png
 *.db
+
+settings.py
