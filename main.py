@@ -9,7 +9,7 @@ from jinja2 import Template
 
 import settings
 from database_repository.db_repository import DBRepository
-from deputat_club_parser import DeputatClubParser
+from deputes_club import deputes_club
 from gosduma_api.api import GosDumaApi, Limit
 from gosduma_screen import GosDumaScreen
 from graphs import Graph
@@ -94,12 +94,36 @@ class Deputy(object):
         self.name = result_by_deputy_dict.get('name', None)
         self.patronymic = result_by_deputy_dict.get('patronymic', None)
 
+        self.url = None
+        self.kpd = None
+
+        deputes_club_filter_list = list(filter(lambda x: x[0] in self.get_fio(), deputes_club))
+
+        if deputes_club_filter_list:
+            try:
+                self.url = deputes_club_filter_list[0][1]
+            except:
+                self.url = ''
+
+            try:
+                self.kpd = deputes_club_filter_list[0][2]
+            except:
+                self.kpd = ''
+
     def get_fio(self):
+
+        return '{0} {1} {2}'.format(self.family, self.name, self.get_patronomic())
+
+    def get_info(self):
+        if self.url and self.kpd:
+            return '<a href="{0}">{1}</a> (КПД: {2}%)'.format(self.url, self.get_fio(), self.kpd)
+        return '{0}'.format(self.get_fio())
+
+    def get_patronomic(self):
         patronymic = self.patronymic
         if patronymic is None:
             patronymic = ''
-
-        return '{0} {1} {2}'.format(self.family, self.name, patronymic)
+        return patronymic
 
     def get_result(self):
         if self.result == 'for':
@@ -202,7 +226,17 @@ def start_move_articles():
 
             time.sleep(1)
             entry = {
-                'blocks': blocks + [
+                'blocks': [
+                    {
+                        "type": "text",
+                        "data": {
+                            "text": "<p>{0}</p>".format(vote_obj.subject),
+                            "text_truncated": ""
+                        },
+                        "cover": True,
+                        "anchor": ""
+                    },
+                ] + blocks + [
                     {
                         "type": "text",
                         "data": {
@@ -214,13 +248,16 @@ def start_move_articles():
                     },
                 ]
             }
-            file = json.dumps(entry)
-            result = tj_api.create_entry(vote_obj.subject, render_template, settings.SUBSITE_ID, entry=file)
-            if result['error']['code'] == 400:
+            file_json = json.dumps(entry)
+            result = tj_api.create_entry('Результат голосования депутатов Госдумы {0}'.format(vote_obj.vote_date), render_template, settings.SUBSITE_ID, entry=file_json)
+            if 'error' in result:
+                print(result)
                 logging.error(result['message'])
+                break
             else:
+                print('Success add.')
                 db.create_vote_history(vote_id=vote_id, vote_date=vote_obj.vote_date)
-            time.sleep(3)
+            time.sleep(120)
 
 
 if __name__ == '__main__':
@@ -228,4 +265,5 @@ if __name__ == '__main__':
         start_move_articles()
         logging.info("Success")
     except Exception as ex:
+        print(str(ex))
         logging.error(str(ex))

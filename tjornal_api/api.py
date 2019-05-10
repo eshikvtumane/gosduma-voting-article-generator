@@ -50,11 +50,10 @@ class TjApi(object):
     def create_entry(self, title, content, subsite_id, attachments=None, entry=None):
         url = self.url + 'entry/create'
         headers = self.generate_headers()
-        # headers['Content-Type'] = 'multipart/form-data'
         if attachments:
             return requests.post(url, data={'title': title, 'text': content, 'subsite_id': subsite_id, 'attachments': attachments}, headers=headers).json()
         else:
-            return requests.post(url, data={'title': title, 'text': content, 'subsite_id': subsite_id, 'entry': entry}, headers=headers).json()
+            return requests.post(url, data={'title': title, 'subsite_id': subsite_id, 'entry': entry}, headers=headers).json()
 
     def uploader_upload(self, file_path):
         url = self.url + 'uploader/upload'

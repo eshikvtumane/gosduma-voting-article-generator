@@ -20,7 +20,7 @@
   </p>
   <p>
       {% for depute in faction.deputies %}
-          {{ depute.get_fio() }} - {{ depute.get_result() }} {{ depute.get_smile() }}
+          {{ depute.get_info() }} - {{ depute.get_result() }} {{ depute.get_smile() }}
           <br/>
       {% endfor %}
   </p>
@@ -28,5 +28,8 @@
 {% endfor %}
 
 <p>
- <i>Источник: </i><a href="http://duma.gov.ru">сайт Государственно Думы РФ</a>
+ <i>Источник: </i><a href="http://duma.gov.ru">сайт Государственной Думы РФ</a>
+</p>
+<p>
+ <i>Источник КПД: </i><a href="http://www.deputat.club">сайт Депутат Клуб</a>
 </p>

@@ -56,4 +56,11 @@ class DeputatClubParser(object):
 
 
 if __name__ == '__main__':
-    print(DeputatClubParser().get_deputates()[0])
+    content_deputes = []
+    for depute in DeputatClubParser().get_deputates():
+        content_deputes.append('["{0}", "{1}", {2}]'.format(depute.name, depute.url, depute.kpd))
+
+    content_deputes = 'deputes_club = [{0}]'.format(','.join(content_deputes))
+
+    with open('deputes_club.py', 'w', encoding='utf-8') as f:
+        f.write(content_deputes)
